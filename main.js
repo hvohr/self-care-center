@@ -2,15 +2,15 @@ var affirmations = [
     "I forgive myself and set myself free.",
     "I believe I can be all that I want to be.",
     "I am in the process of becoming the best version of myself.",
-    "I have the freedom & power to create the life I desire.",
-    "I choose to be kind to myself and love myself unconditionally.",
-    "My possibilities are endless.",
-    "I am worthy of my dreams.",
-    "I deserve to be healthy and feel good.",
-    "I am full of energy and vitality and my mind is calm and peaceful.",
-    "Every day I am getting healthier and stronger.",
-    "I honor my body by trusting the signals that it sends me.",
-    "I manifest perfect health by making smart choices."
+    // "I have the freedom & power to create the life I desire.",
+    // "I choose to be kind to myself and love myself unconditionally.",
+    // "My possibilities are endless.",
+    // "I am worthy of my dreams.",
+    // "I deserve to be healthy and feel good.",
+    // "I am full of energy and vitality and my mind is calm and peaceful.",
+    // "Every day I am getting healthier and stronger.",
+    // "I honor my body by trusting the signals that it sends me.",
+    // "I manifest perfect health by making smart choices."
 ];
 
 var mantras = [
@@ -38,16 +38,15 @@ var affirmationRadio = document.querySelector("#affirmation-radio");
 var mantraRadio = document.querySelector("#mantra-radio");
 var meditatingImage = document.querySelector(".meditating-person");
 var userChosenMessage = document.querySelector(".user-random-phrase");
-var clearMessageButton = document.querySelector(".clear-message-button")
-var clearButtonClass = document.querySelector(".user-clear-button")
+var removeMessageButton = document.querySelector(".remove-message-button")
+var removeButtonClass = document.querySelector(".user-remove-button")
 
 // event listeners:
 
 recieveMessageButton.addEventListener("click", recieveMessage)
-clearMessageButton.addEventListener("click", clearMessage);
+removeMessageButton.addEventListener("click", removeMessage);
 
 // functions:
-
 
 function showAffirmation() {
     var myText;
@@ -59,74 +58,74 @@ function showAffirmation() {
     }
     userChosenMessage.removeAttribute("hidden");
     meditatingImage.setAttribute("hidden", "");
-    clearButtonClass.removeAttribute("hidden");
+    removeButtonClass.removeAttribute("hidden");
 
 };
 
-var usedAffirmation = [];
-var usedMantra = [];
+usedAffirmation = [];
+usedMantra = [];
 
 function generateUniqueAffirmation(array) {
     var random = Math.floor(Math.random() * array.length);
-    random = Number(random);
-    if (!usedAffirmation.includes(random)) {
-        usedAffirmation.push(random);
-        return random;
-    } else if (usedAffirmation.includes(random) && usedAffirmation.length < array.length) {
-        return generateUniqueAffirmation(array);
-    } else {
+    // to do: confirm correct conditional??? 
+    if (usedAffirmation.length === array.length) {
         alert('No more affirmations available. You will now see repeats')
         usedAffirmation = []
-        return generateUniqueAffirmation(array);
     }
+    while (usedAffirmation.includes(array[random]) && array.length > 0) {
+        random = Math.floor(Math.random() * array.length)
+    }
+    usedAffirmation.push(array[random])
+    return random;
+
 }
 
 function generateUniqueMantra(array) {
     var random = Math.floor(Math.random() * array.length);
-    random = Number(random);
-    if (!usedMantra.includes(random)) {
-        usedMantra.push(random);
-        return random;
-    } else if (usedMantra.includes(random) && usedMantra.length < array.length) {
-        return generateUniqueMantra(array);
-    } else {
+    if (usedMantra.length === array.length) {
         alert('No more mantras available. You will now see repeats')
         usedMantra = []
-        return generateUniqueMantra(array);
     }
+    while (usedMantra.includes(array[random]) && array.length > 0) {
+        random = Math.floor(Math.random() * array.length)
+    }
+    usedMantra.push(array[random])
+    return random;
+
 }
 
-function randomAffirmation() {
-    var newAffirmations = affirmations[generateUniqueAffirmation(affirmations)];
-    console.log(newAffirmations);
-    return newAffirmations;
-}
-
-
-function randomMantras() {
-    var newMantras = mantras[generateUniqueMantra(mantras)];
-    return newMantras;
-};
-
-
-function recieveMessage() {
-    userChosenMessage.innerHTML = '';
-    if (affirmationRadio.checked) {
-        userChosenMessage.innerHTML +=
-            `<p class= "user-random-phrase">${randomAffirmation()}</p>`
-        showAffirmation();
-    } else if (mantraRadio.checked) {
-        userChosenMessage.innerHTML +=
-            `<p class= "user-random-phrase">${randomMantras()}</p>`
+    function recieveMessage() {
+        if (affirmationRadio.checked) {
+            console.log(affirmations)
+            if (affirmations.length === 0) {
+                alert("No more available affirmations, reload the page to start again!")
+                return;
+            }
+            var index = generateUniqueAffirmation(affirmations)
+            userChosenMessage.innerText = affirmations[index]
+            userChosenMessage.id = index
+        } else if (mantraRadio.checked) {
+            if (mantras.length === 0) {
+                alert("No more available mantras, reload the page to start again!")
+                return;
+            }
+            var index = generateUniqueMantra(mantras)
+            userChosenMessage.innerText = mantras[index]
+            userChosenMessage.id = index
+        }
         showAffirmation();
     }
-}
 
-function clearMessage() {
-    userChosenMessage.setAttribute("hidden", "");
-    alert("Message cleared, you will not see that again!")
-    meditatingImage.removeAttribute("hidden");
-    affirmations.splice()
-    clearButtonClass.setAttribute("hidden", "");
-};
+    function removeMessage() {
+        alert("Message cleared, you will not see that again!")
+        if (affirmationRadio.checked) {
+            affirmations.splice(userChosenMessage.id, 1)
+        } else {
+            mantras.splice(userChosenMessage.id, 1)
+
+        }
+        userChosenMessage.setAttribute("hidden", "");
+        meditatingImage.removeAttribute("hidden");
+        removeButtonClass.setAttribute("hidden", "");
+    };
 
